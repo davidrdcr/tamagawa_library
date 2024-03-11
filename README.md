@@ -25,7 +25,7 @@ El DMA debe de configurarse para recepción en **modo circular**.
 
 ##	4.  Configurar el pin para controlar la dirección.
 
-Para poder controlar la transmición y recepción del MAX485, es necesario utilizar un pin GPIO.  En este caso, se utiliza el PA10.
+Para poder controlar la transmición y recepción del MAX485, es necesario utilizar un pin GPIO.  En este caso, se utiliza el PA10. De utilizar otro, es necesario modificarlo dentro de la función `transmit` del archivo `tamagawa.c`.
 
 ![alt text](https://github.com/davidrdcr/tamagawa_library/blob/main/img/e5.png?raw=true)
 
