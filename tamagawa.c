@@ -10,6 +10,9 @@ uint8_t USART6_RX_Buff[11];
 uint8_t tamagawa_rx_cnt = 0;
 uint8_t usart_data;
 
+float position  = 0;
+short turns = 0;
+
 void tx_prepare(uint8_t *tx, uint8_t *tx_size, uint8_t *rx_size);
 void tamagawa_tx(uint8_t tx_size, uint8_t *tx_buffer);
 uint8_t crc(uint8_t *s, uint8_t len);
@@ -113,6 +116,7 @@ void rx_parse(uint8_t *p)
             ti.rx.sf = p[1];
             ti.rx.abs = p[2] | (p[3] << 8) | (p[4] << 16);
             ti.rx.crc = p[5];
+            position  = ((double)(ti.rx.abs) / 131071) * 360;
             break;
         }
         case DATA_ID_7:
@@ -131,6 +135,7 @@ void rx_parse(uint8_t *p)
             ti.rx.sf = p[1];
             ti.rx.abm = p[2] | (p[3] << 8) | (p[4] << 16);
             ti.rx.crc = p[5];
+            turns = ti.rx.abm;
             break;
 
         case DATA_ID_2:
@@ -148,6 +153,9 @@ void rx_parse(uint8_t *p)
             ti.rx.abm = p[6] | (p[7] << 8) | (p[8] << 16);
             ti.rx.almc = p[9];
             ti.rx.crc = p[10];
+            position  = ((double)(ti.rx.abs) / 131071) * 360;
+            turns = ti.rx.abm;
+
             break;
 
         case DATA_ID_6:
@@ -197,6 +205,5 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	if(tamagawa_rx_cnt == rx_size)
 	{
 		rx_parse(USART6_RX_Buff);
-
 	}
 }
