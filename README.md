@@ -1,51 +1,62 @@
 # tamagawa_library
-Nota: 
+Note: This library is a modified version derived from the repository library of [imuncle](https://github.com/imuncle), Embedded_Peripheral_Libs. This code has been tested with the TS5700N8501 encoder.
 
-## 1. Conexión
+## 1. Interface Setup
 
-El encoder utiliza el protocolo RS-485. Para su uso, es necesario un transceivers RS-485 con una velocidad de al menos 2.5 Mbps. En este caso se utilizó un MAX485.
+The encoder utilizes the RS-485 protocol. To operate it, a transceiver supporting RS-485 with a minimum speed of 2.5 Mbps is required. In this instance, a MAX485 transceiver was employed.
 
 ![alt text](https://github.com/davidrdcr/tamagawa_library/blob/main/img/diagram.png?raw=true)
 
-##	2. Configuración del reloj
+##	2. Clock Configuration
 
-Para utilizar la comunicación por UART con una velocidad de 2.5 Mbps, es necesario configurar el High Speed Clock como Crystal/Ceramic Resonator y aumentar la frecuencia a una que pueda permitir la velocidad del periférico UART.
+For UART communication at a speed of 2.5 Mbps, it's essential to configure the High-Speed Clock as a Crystal/Ceramic Resonator and adjust the frequency to one suitable for the UART peripheral speed.
 
 ![alt text](https://github.com/davidrdcr/tamagawa_library/blob/main/img/e3.png?raw=true)
 ![alt text](https://github.com/davidrdcr/tamagawa_library/blob/main/img/e4.png?raw=true)
 
-##	3.  Configuración del periférico UART
+##	3.  UART Peripheral Configuration
 
-El UART debe ser configurado en modo asíncrono. El periférico UART debe ser configurado a **2.5 Mbps o 2500000 Bits/s, 8 bits, 1 bit de parada**.
+The UART should be set to asynchronous mode. Configure the UART peripheral to **2.5 Mbps or 2500000 bits/s, 8 data bits, 1 stop bit**.
+
 ![alt text](https://github.com/davidrdcr/tamagawa_library/blob/main/img/e1.png?raw=true)
 
-El DMA debe de configurarse para recepción en **modo circular**.
+Configure the DMA for reception in **circular mode**.
 
 ![alt text](https://github.com/davidrdcr/tamagawa_library/blob/main/img/e2.png?raw=true)
 
-##	4.  Configurar el pin para controlar la dirección.
+##	4.  Pin Configuration for Direction Control
 
-Para poder controlar la transmición y recepción del MAX485, es necesario utilizar un pin GPIO.  En este caso, se utiliza el PA10. De utilizar otro, es necesario modificarlo dentro de la función `transmit` del archivo `tamagawa.c`.
+To manage transmission and reception of the MAX485, utilize a GPIO pin. In this instance, PA10 is employed. If another pin is used, ensure to modify it within the `tamagawa_tx` function of the `tamagawa.c` file.
 
 ![alt text](https://github.com/davidrdcr/tamagawa_library/blob/main/img/e5.png?raw=true)
 
-##	5.  Agregar la librería
+##	5.  Library Integration
 
-Agregar el archivo `tamagawa. c` a la carpeta src y agregar la cabecera `tamagawa.h` a la carpeta inc del proyecto.
+Add the `tamagawa.c` file to the src folder and include the header `tamagawa.h` in the inc folder of the project.
 
-## 	6.  Utilizar la librería 
+## 	6.  Library Utilization
 
     #include "tamagawa.h"
-    uint32_t position = 0;
-    short turns = 0;
+    
+    (...)
+  
     int main (){
-    	
+    
+      (...)
+      
       HAL_UART_Receive_DMA (&huart6, &usart_data, 1);
       
       while (1){
+      
     	tamagawa_read(DATA_ID_3);
-    	HAL_Delay(15);
+    	HAL_Delay(15); 
+    	
+    	(...) 
       }
       
     }
 
+## Notes
+
+ - The library records the encoder's position and the number of turns in the variables `position` and `turns`, respectively.
+ - Never transmit any requests to the encoder while it is transmitting data. Doing so could potentially damage the interface. For this reason, it is advisable to maintain a delay between each reading.
